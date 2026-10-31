@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRK.BRODERLINE - Official Download Center</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Orbitron & Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        sans: ['Prompt', 'sans-serif']
+                    },
+                    colors: {
+                        cyber: {
+                            dark: '#07090e',
+                            card: '#0f1420',
+                            border: '#1e293b',
+                            pink: '#ff0055',
+                            cyan: '#00e5ff',
+                            green: '#00ff88',
+                            yellow: '#ffcc00'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #07090e;
+            color: #f1f5f9;
+            font-family: 'Prompt', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Canvas Overlay Background */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Neon Text Glow Effect */
+        .neon-title {
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.6), 0 0 20px rgba(0, 229, 255, 0.4);
+        }
+        
+        .neon-box-cyan {
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+        }
+
+        .neon-box-pink {
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
+        }
+
+        /* Glitch Animation Keyframes */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(1000%); }
+        }
+
+        .scanline-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        .scanline-effect::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07090e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00e5ff;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between items-center relative selection:bg-cyber-pink selection:text-white">
+
+    <!-- Interactive Background Canvas -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Top Navigation Header -->
+    <header class="w-full z-10 border-b border-slate-800/80 bg-cyber-dark/80 backdrop-blur-md px-4 py-3 sticky top-0">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-cyber-pink to-cyber-cyan p-[2px] flex items-center justify-center shadow-lg shadow-cyber-pink/20">
+                    <div class="w-full h-full bg-cyber-dark rounded-[6px] flex items-center justify-center">
+                        <i class="fa-solid font-orbitron font-black text-cyber-cyan text-sm">TRK</i>
+                    </div>
+                </div>
+                <span class="font-orbitron font-black text-lg tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-cyber-cyan">
+                    TRK.<span class="text-cyber-pink">BRODERLINE</span>
+                </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- Status Badge Header -->
+                <div id="headerStatusBadge" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="headerStatusText">SERVER ONLINE</span>
+                </div>
+
+                <!-- Admin Open Modal Button -->
+                <button onclick="openAdminModal()" class="w-8 h-8 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-cyber-cyan transition-all flex items-center justify-center title="จัดการระบบ (Admin)">
+                    <i class="fa-solid fa-gear text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-4xl px-4 py-8 z-10 my-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left Info Card / Cover Banner -->
+            <div class="lg:col-span-5 bg-cyber-card border border-slate-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden backdrop-blur-md scanline-effect">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyber-pink via-purple-500 to-cyber-cyan"></div>
+                
+                <!-- Game Logo Preview Image Banner -->
+                <div class="relative w-full h-44 rounded-xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 flex flex-col items-center justify-center overflow-hidden mb-5 group">
+                    <div class="absolute inset-0 bg-gradient-to-br from-cyber-pink/20 to-cyber-cyan/20 opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                    <i class="fa-solid fa-gamepad text-6xl text-slate-700 group-hover:text-cyber-cyan transition-colors duration-500 transform group-hover:scale-110"></i>
+                    <div class="absolute bottom-3 left-3 bg-slate-900/90 border border-slate-700/60 px-3 py-1 rounded-lg text-xs font-orbitron font-bold text-cyber-pink">
+                        BUILD 2026.1
+                    </div>
+                </div>
+
+                <!-- Game Title & Short Desc -->
+                <h1 id="displayTitle" class="font-orbitron font-black text-2xl tracking-wide text-white mb-1 neon-title">
+                    TRK.BRODERLINE
+                </h1>
+                <p id="displaySubtitle" class="text-xs text-slate-400 mb-5 leading-relaxed">
+                    เกมแอ็กชันไซเบอร์พังก์โอเพนเวิลด์ สัมผัสประสบการณ์การต่อสู้สุดมันส์ ภาพกราฟิกสวยงามระดับ Next-Gen
+                </p>
+
+                <!-- Key Specs Pills -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-xs p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                        <span class="text-slate-400 flex items-center gap-2">
+                            <i class="fa-solid fa-hard-drive text-cyber-cyan"></i> ขนาดไฟล์
+                        </span>
+                        <span id="displayFileSize" class="font-orbitron font-bold text-cyber-cyan">15.1 GB</span>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                        <span class="text-slate-400 flex items-center gap-2">
+                            <i class="fa-solid fa-code-branch text-purple-400"></i> เวอร์ชั่น (Build)
+                        </span>
+                        <span id="displayVersion" class="font-orbitron font-bold text-purple-300">v1.0.0</span>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                        <span class="text-slate-400 flex items-center gap-2">
+                            <i class="fa-brands fa-windows text-blue-400"></i> รองรับระบบ
+                        </span>
+                        <span id="displayOs" class="font-bold text-slate-200">Windows 10/11 64-bit</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Main Download Box -->
+            <div class="lg:col-span-7 bg-cyber-card border border-slate-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden backdrop-blur-md">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyber-cyan to-cyber-pink"></div>
+
+                <!-- Announcement / Alert Banner -->
+                <div id="noticeBanner" class="mb-5 p-4 rounded-xl bg-slate-900/90 border border-slate-800 transition-all">
+                    <div class="flex items-start gap-3">
+                        <div id="noticeIcon" class="mt-0.5 text-cyber-green text-lg">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="text-xs space-y-1">
+                            <div id="noticeTitle" class="font-bold text-slate-200 text-sm">ไฟล์พร้อมสำหรับการดาวน์โหลด</div>
+                            <div id="noticeDesc" class="text-slate-400">
+                                ลิงก์ตรงผ่าน Google Drive ความเร็วสูง กรุณาเตรียมพื้นที่ไดรฟ์อย่างน้อย 20 GB
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Grid -->
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="p-3 bg-slate-900/70 border border-slate-800/80 rounded-xl text-left">
+                        <span class="text-[11px] text-slate-400 block mb-1">สถานะเซิร์ฟเวอร์</span>
+                        <div id="statusGridBadge" class="flex items-center gap-2 text-xs font-bold text-emerald-400">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            <span id="statusGridText">พร้อมใช้งาน (Ready)</span>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-900/70 border border-slate-800/80 rounded-xl text-left">
+                        <span class="text-[11px] text-slate-400 block mb-1">การตรวจสอบความปลอดภัย</span>
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-cyber-cyan">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>สแกนไวรัสเรียบร้อย</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Interactive Download Button -->
+                <div class="space-y-3">
+                    <button id="downloadBtn" onclick="handleDownloadClick()" class="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-cyber-pink via-red-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-orbitron font-extrabold text-lg tracking-wider shadow-lg shadow-cyber-pink/30 hover:shadow-cyber-pink/50 transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-3 relative overflow-hidden group">
+                        <i id="btnIcon" class="fa-solid fa-rocket text-xl group-hover:translate-x-1 transition-transform"></i>
+                        <span id="btnText">🚀 ดาวน์โหลดเกมทันที</span>
+                    </button>
+
+                    <!-- Countdown Loader Area (Hidden by default) -->
+                    <div id="timerContainer" class="hidden text-center py-2 bg-slate-900/80 border border-slate-800 rounded-xl">
+                        <div class="text-xs text-amber-400 font-semibold mb-1 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-spinner fa-spin text-amber-400"></i>
+                            <span>กำลังเตรียมลิงก์ดาวน์โหลดความเร็วสูง...</span>
+                        </div>
+                        <div class="text-2xl font-orbitron font-black text-cyber-cyan">
+                            <span id="countdownTimer">5</span> <span class="text-xs font-normal text-slate-400">วินาที</span>
+                        </div>
+                        <div class="w-3/4 mx-auto bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
+                            <div id="progressBar" class="bg-gradient-to-r from-cyber-pink to-cyber-cyan h-full w-0 transition-all duration-1000"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instructions / Patch Notes Mini Tab -->
+                <div class="mt-6 pt-5 border-t border-slate-800/80 text-xs text-slate-400 space-y-2 text-left">
+                    <div class="font-bold text-slate-300 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-cyber-cyan"></i> คำแนะนำในการติดตั้ง
+                    </div>
+                    <ul class="list-disc list-inside space-y-1 text-[11px] text-slate-400 pl-1">
+                        <li>แตกไฟล์ ZIP / RAR ด้วยโปรแกรม WinRAR หรือ 7-Zip เวอร์ชั่นล่าสุด</li>
+                        <li>ปิดโปรแกรมป้องกันไวรัสชั่วคราวหากเกิดข้อผิดพลาดในการแตกไฟล์</li>
+                        <li>รันไฟล์ <code class="bg-slate-800 px-1.5 py-0.5 rounded text-cyber-pink">Setup.exe</code> ด้วยสิทธิ์ Administrator</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Area -->
+    <footer class="w-full border-t border-slate-800/60 bg-cyber-dark/90 py-4 px-4 z-10 text-center text-xs text-slate-500">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div>© 2026 TRK.BRODERLINE. All Rights Reserved.</div>
+            <div class="flex items-center gap-4">
+                <a href="javascript:void(0)" onclick="openAdminModal()" class="hover:text-cyber-cyan transition-colors">
+                    <i class="fa-solid fa-lock text-xs mr-1"></i>เข้าสู่ระบบ Admin
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- MODALS SECTION                             -->
+    <!-- ========================================== -->
+
+    <!-- ADMIN LOGIN MODAL -->
+    <div id="adminLoginModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cyber-card border border-slate-800 rounded-2xl w-full max-w-md p-6 relative shadow-2xl">
+            <button onclick="closeModal('adminLoginModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 rounded-full bg-cyber-pink/10 border border-cyber-pink/30 mx-auto flex items-center justify-center text-cyber-pink text-xl mb-3">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <h3 class="font-orbitron font-bold text-xl text-white">ADMIN AUTHENTICATION</h3>
+                <p class="text-xs text-slate-400 mt-1">กรอกรหัสผ่านเพื่อเข้าสู่แผงควบคุมระบบ (รหัสเริ่มต้น: <span class="text-cyber-cyan font-mono">1234</span>)</p>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">รหัสผ่านแอดมิน (Admin Password)</label>
+                    <input type="password" id="adminPasswordInput" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:outline-none focus:border-cyber-cyan transition-all">
+                </div>
+
+                <div id="loginErrorMsg" class="hidden text-xs text-rose-500 bg-rose-500/10 p-2.5 rounded-lg border border-rose-500/20 text-center">
+                    รหัสผ่านไม่ถูกต้อง! กรุณาลองใหม่อีกครั้ง
+                </div>
+
+                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-cyan to-blue-600 text-slate-950 font-bold text-sm hover:opacity-90 transition-opacity">
+                    ยืนยันเข้าสู่ระบบ
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL CONTROL MODAL -->
+    <div id="adminPanelModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-cyber-card border border-slate-700 rounded-2xl w-full max-w-2xl p-6 relative shadow-2xl my-8">
+            
+            <div class="flex justify-between items-center pb-4 border-b border-slate-800 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="px-3 py-1 rounded-md bg-cyber-pink/20 text-cyber-pink text-xs font-orbitron font-bold">ADMIN PANEL</div>
+                    <h2 class="font-orbitron font-bold text-lg text-white">จัดการระบบและสถานะเว็บ</h2>
+                </div>
+                <button onclick="closeModal('adminPanelModal')" class="text-slate-400 hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form onsubmit="saveAdminSettings(event)" class="space-y-5">
+                
+                <!-- Toggle Status Section -->
+                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-3">
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                        1. ตั้งค่าสถานะการเปิด/ปิด ดาวน์โหลด
+                    </label>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <label id="statusOptionOnline" onclick="selectStatusOption('ONLINE')" class="cursor-pointer border border-emerald-500/40 bg-emerald-500/10 p-3 rounded-xl flex items-center gap-3 transition-all">
+                            <input type="radio" name="systemStatus" value="ONLINE" id="radioOnline" class="hidden">
+                            <div class="w-4 h-4 rounded-full border-2 border-emerald-400 flex items-center justify-center">
+                                <div id="dotOnline" class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-emerald-400">🟢 พร้อมดาวน์โหลด</div>
+                                <div class="text-[10px] text-slate-400">เปิดระบบให้ผู้ใช้กดดาวน์โหลดได้</div>
+                            </div>
+                        </label>
+
+                        <label id="statusOptionOffline" onclick="selectStatusOption('OFFLINE')" class="cursor-pointer border border-slate-800 bg-slate-900/50 p-3 rounded-xl flex items-center gap-3 transition-all">
+                            <input type="radio" name="systemStatus" value="OFFLINE" id="radioOffline" class="hidden">
+                            <div class="w-4 h-4 rounded-full border-2 border-slate-600 flex items-center justify-center">
+                                <div id="dotOffline" class="w-2 h-2 rounded-full bg-transparent"></div>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-rose-400">🔴 ปิดปรับปรุง / ไม่พร้อม</div>
+                                <div class="text-[10px] text-slate-400">ปิดการกดปุ่มโหลดชั่วคราว</div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Custom Maintenance Reason -->
+                    <div id="maintenanceReasonBox" class="space-y-1 pt-2">
+                        <label class="block text-[11px] text-slate-400">ข้อความแจ้งเตือนเมื่อปิดปรับปรุง</label>
+                        <input type="text" id="adminMaintenanceMsg" placeholder="เช่น เซิร์ฟเวอร์กำลังปรับปรุงระบบ หรือ อัปเดตลิงก์ใหม่" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyber-pink">
+                    </div>
+                </div>
+
+                <!-- Links & Info Settings -->
+                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-3">
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                        2. แก้ไขข้อมูลเกม และ ลิงก์ดาวน์โหลด
+                    </label>
+
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block text-slate-400 mb-1">URL ลิงก์ดาวน์โหลด (Target File URL)</label>
+                            <input type="url" id="adminFileUrl" required class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-cyber-cyan font-mono focus:outline-none focus:border-cyber-cyan">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-slate-400 mb-1">ชื่อเกม (Title)</label>
+                                <input type="text" id="adminTitle" required class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-cyber-cyan">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1">ขนาดไฟล์ (File Size)</label>
+                                <input type="text" id="adminFileSize" required class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-cyber-cyan">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-slate-400 mb-1">เวอร์ชั่น (Build Version)</label>
+                                <input type="text" id="adminVersion" required class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-cyber-cyan">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1">เปลี่ยนรหัสผ่านแอดมินใหม่ (ถ้าต้องการ)</label>
+                                <input type="password" id="adminNewPass" placeholder="เว้นว่างไว้หากไม่เปลี่ยน" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-cyber-cyan">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeModal('adminPanelModal')" class="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs hover:bg-slate-700">
+                        ยกเลิก
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyber-pink to-cyber-cyan text-slate-950 font-bold text-xs hover:opacity-90 shadow-lg shadow-cyber-pink/20">
+                        💾 บันทึกการเปลี่ยนแปลง
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // DEFAULT CONFIGURATION
+        const DEFAULT_CONFIG = {
+            title: "TRK.BRODERLINE",
+            subtitle: "เกมแอ็กชันไซเบอร์พังก์โอเพนเวิลด์ สัมผัสประสบการณ์การต่อสู้สุดมันส์ ภาพกราฟิกสวยงามระดับ Next-Gen",
+            fileUrl: "https://drive.google.com/file/d/1rTccY_SP1a41ta8-fg7Afl5Ssg1nEXTo/view?usp=sharing",
+            fileSize: "15.1 GB",
+            version: "v1.0.0",
+            os: "Windows 10/11 64-bit",
+            status: "ONLINE", // ONLINE or OFFLINE
+            maintenanceMsg: "ขณะนี้ระบบปิดปรับปรุงชั่วคราวเพื่ออัปเดตเซิร์ฟเวอร์ กรุณากลับมาใหม่อีกครั้งในภายหลัง",
+            adminPass: "1234"
+        };
+
+        // Local state loaded from localStorage
+        let appConfig = { ...DEFAULT_CONFIG };
+
+        // Initialize state on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadConfigFromStorage();
+            updateUI();
+            initBackgroundParticles();
+        });
+
+        // Load config from browser LocalStorage
+        function loadConfigFromStorage() {
+            const saved = localStorage.getItem('trk_download_config');
+            if (saved) {
+                try {
+                    appConfig = { ...DEFAULT_CONFIG, ...JSON.parse(saved) };
+                } catch(e) {
+                    console.error("Could not parse saved config", e);
+                }
+            }
+        }
+
+        // Save config to LocalStorage
+        function saveConfigToStorage() {
+            localStorage.setItem('trk_download_config', JSON.stringify(appConfig));
+        }
+
+        // Render / Refresh Front-end UI
+        function updateUI() {
+            document.getElementById('displayTitle').innerText = appConfig.title;
+            document.getElementById('displayFileSize').innerText = appConfig.fileSize;
+            document.getElementById('displayVersion').innerText = appConfig.version;
+            document.getElementById('displayOs').innerText = appConfig.os;
+
+            const isOnline = appConfig.status === "ONLINE";
+            const downloadBtn = document.getElementById('downloadBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            
+            const headerBadge = document.getElementById('headerStatusBadge');
+            const headerText = document.getElementById('headerStatusText');
+
+            const statusGridBadge = document.getElementById('statusGridBadge');
+            const statusGridText = document.getElementById('statusGridText');
+
+            const noticeBanner = document.getElementById('noticeBanner');
+            const noticeIcon = document.getElementById('noticeIcon');
+            const noticeTitle = document.getElementById('noticeTitle');
+            const noticeDesc = document.getElementById('noticeDesc');
+
+            if (isOnline) {
+                // ONLINE STATE
+                headerBadge.className = "flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400";
+                headerText.innerText = "SERVER ONLINE";
+
+                statusGridBadge.className = "flex items-center gap-2 text-xs font-bold text-emerald-400";
+                statusGridText.innerText = "พร้อมใช้งาน (Ready)";
+
+                noticeBanner.className = "mb-5 p-4 rounded-xl bg-slate-900/90 border border-emerald-500/30 transition-all";
+                noticeIcon.className = "mt-0.5 text-emerald-400 text-lg";
+                noticeIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                noticeTitle.innerText = "ไฟล์พร้อมสำหรับการดาวน์โหลด";
+                noticeTitle.className = "font-bold text-emerald-400 text-sm";
+                noticeDesc.innerText = "ลิงก์ตรงผ่าน Google Drive ความเร็วสูง กรุณาเตรียมพื้นที่ไดรฟ์อย่างน้อย 20 GB";
+
+                downloadBtn.disabled = false;
+                downloadBtn.className = "w-full py-4 px-6 rounded-xl bg-gradient-to-r from-cyber-pink via-red-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-orbitron font-extrabold text-lg tracking-wider shadow-lg shadow-cyber-pink/30 hover:shadow-cyber-pink/50 transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-3 cursor-pointer opacity-100";
+                btnText.innerText = "🚀 ดาวน์โหลดเกมทันที";
+                btnIcon.className = "fa-solid fa-rocket text-xl";
+            } else {
+                // OFFLINE / MAINTENANCE STATE
+                headerBadge.className = "flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-400";
+                headerText.innerText = "MAINTENANCE";
+
+                statusGridBadge.className = "flex items-center gap-2 text-xs font-bold text-rose-400";
+                statusGridText.innerText = "ปิดปรับปรุง (Maintenance)";
+
+                noticeBanner.className = "mb-5 p-4 rounded-xl bg-rose-950/30 border border-rose-500/40 transition-all";
+                noticeIcon.className = "mt-0.5 text-rose-400 text-lg";
+                noticeIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                noticeTitle.innerText = "ระบบไม่พร้อมดาวน์โหลดชั่วคราว";
+                noticeTitle.className = "font-bold text-rose-400 text-sm";
+                noticeDesc.innerText = appConfig.maintenanceMsg || "อยู่ระหว่างการปรับปรุงระบบ";
+
+                downloadBtn.disabled = true;
+                downloadBtn.className = "w-full py-4 px-6 rounded-xl bg-slate-800 border border-slate-700 text-slate-500 font-orbitron font-bold text-base cursor-not-allowed flex items-center justify-center gap-3 opacity-70";
+                btnText.innerText = "🔒 ระบบปิดปรับปรุงชั่วคราว";
+                btnIcon.className = "fa-solid fa-lock text-lg";
+            }
+        }
+
+        // DOWNLOAD COUNTDOWN SYSTEM
+        let isDownloading = false;
+        function handleDownloadClick() {
+            if (isDownloading || appConfig.status !== "ONLINE") return;
+
+            isDownloading = true;
+            const downloadBtn = document.getElementById('downloadBtn');
+            const timerContainer = document.getElementById('timerContainer');
+            const countdownTimer = document.getElementById('countdownTimer');
+            const progressBar = document.getElementById('progressBar');
+
+            downloadBtn.style.display = 'none';
+            timerContainer.classList.remove('hidden');
+
+            let timeLeft = 5;
+            countdownTimer.innerText = timeLeft;
+            progressBar.style.width = '0%';
+
+            const interval = setInterval(() => {
+                timeLeft--;
+                countdownTimer.innerText = timeLeft;
+                const percentage = ((5 - timeLeft) / 5) * 100;
+                progressBar.style.width = `${percentage}%`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    
+                    // Redirect to target link
+                    window.location.href = appConfig.fileUrl;
+
+                    // Reset button after short delay
+                    setTimeout(() => {
+                        isDownloading = false;
+                        timerContainer.classList.add('hidden');
+                        downloadBtn.style.display = 'flex';
+                    }, 3000);
+                }
+            }, 1000);
+        }
+
+        // ADMIN MODAL & AUTHENTICATION
+        function openAdminModal() {
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('loginErrorMsg').classList.add('hidden');
+            document.getElementById('adminLoginModal').classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const inputPass = document.getElementById('adminPasswordInput').value;
+            if (inputPass === appConfig.adminPass) {
+                closeModal('adminLoginModal');
+                populateAdminForm();
+                document.getElementById('adminPanelModal').classList.remove('hidden');
+            } else {
+                document.getElementById('loginErrorMsg').classList.remove('hidden');
+            }
+        }
+
+        // POPULATE ADMIN FORM DATA
+        function populateAdminForm() {
+            document.getElementById('adminFileUrl').value = appConfig.fileUrl;
+            document.getElementById('adminTitle').value = appConfig.title;
+            document.getElementById('adminFileSize').value = appConfig.fileSize;
+            document.getElementById('adminVersion').value = appConfig.version;
+            document.getElementById('adminMaintenanceMsg').value = appConfig.maintenanceMsg;
+            document.getElementById('adminNewPass').value = '';
+
+            selectStatusOption(appConfig.status);
+        }
+
+        function selectStatusOption(status) {
+            const radioOnline = document.getElementById('radioOnline');
+            const radioOffline = document.getElementById('radioOffline');
+            const optOnline = document.getElementById('statusOptionOnline');
+            const optOffline = document.getElementById('statusOptionOffline');
+            const dotOnline = document.getElementById('dotOnline');
+            const dotOffline = document.getElementById('dotOffline');
+
+            if (status === 'ONLINE') {
+                radioOnline.checked = true;
+                optOnline.className = "cursor-pointer border-2 border-emerald-500 bg-emerald-500/10 p-3 rounded-xl flex items-center gap-3 transition-all";
+                optOffline.className = "cursor-pointer border border-slate-800 bg-slate-900/50 p-3 rounded-xl flex items-center gap-3 transition-all";
+                dotOnline.className = "w-2 h-2 rounded-full bg-emerald-400";
+                dotOffline.className = "w-2 h-2 rounded-full bg-transparent";
+            } else {
+                radioOffline.checked = true;
+                optOffline.className = "cursor-pointer border-2 border-rose-500 bg-rose-500/10 p-3 rounded-xl flex items-center gap-3 transition-all";
+                optOnline.className = "cursor-pointer border border-slate-800 bg-slate-900/50 p-3 rounded-xl flex items-center gap-3 transition-all";
+                dotOffline.className = "w-2 h-2 rounded-full bg-rose-400";
+                dotOnline.className = "w-2 h-2 rounded-full bg-transparent";
+            }
+        }
+
+        function saveAdminSettings(e) {
+            e.preventDefault();
+            const selectedStatus = document.querySelector('input[name="systemStatus"]:checked').value;
+            
+            appConfig.status = selectedStatus;
+            appConfig.fileUrl = document.getElementById('adminFileUrl').value;
+            appConfig.title = document.getElementById('adminTitle').value;
+            appConfig.fileSize = document.getElementById('adminFileSize').value;
+            appConfig.version = document.getElementById('adminVersion').value;
+            appConfig.maintenanceMsg = document.getElementById('adminMaintenanceMsg').value;
+
+            const newPass = document.getElementById('adminNewPass').value;
+            if (newPass.trim() !== '') {
+                appConfig.adminPass = newPass.trim();
+            }
+
+            saveConfigToStorage();
+            updateUI();
+            closeModal('adminPanelModal');
+        }
+
+        // CANVASES BACKGROUND PARTICLE SYSTEM
+        function initBackgroundParticles() {
+            const canvas = document.getElementById('bgCanvas');
+            const ctx = canvas.getContext('2d');
+
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            const particles = [];
+            const particleCount = Math.min(Math.floor(width / 20), 45);
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    radius: Math.random() * 2 + 1,
+                    color: Math.random() > 0.5 ? '#00e5ff' : '#ff0055',
+                    alpha: Math.random() * 0.5 + 0.2
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                // Connect lines between nearby particles
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < 130) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(30, 41, 59, ${1 - dist / 130})`;
+                            ctx.lineWidth = 0.8;
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                // Render Particles
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > width) p.vx *= -1;
+                    if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = p.alpha;
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+    </script>
+</body>
+</html>
